@@ -50,7 +50,6 @@ import com.pau101.cacti.config.DisplaySide;
 	name = Cacti.NAME,
 	version = Cacti.VERSION,
 	clientSideOnly = true,
-	dependencies = "required-after:Forge@[12.16.0.1865,);",
 	guiFactory = "com.pau101.cacti.gui.CactiGuiFactory"
 )
 public class Cacti {
@@ -239,7 +238,7 @@ public class Cacti {
 						.withTabGroup(mod.getModId())
 						.withTab(tab);
 					modTab.setCustomName(mod.getName());
-					if (checkAdjustTab && tab.tabIndex == GuiContainerCreative.selectedTabIndex) {
+					if (checkAdjustTab && tab.getTabIndex() == GuiContainerCreative.selectedTabIndex) {
 						currentTabGroup = modTab;
 						currentCategory = CactiAPI.categories();
 						GuiContainerCreative.selectedTabIndex = 0;
@@ -316,17 +315,17 @@ public class Cacti {
 	public static void initGui(GuiContainerCreative gui) {
 		int parentCategoryX, pagePreviousX, pageNextX;
 		if (Configurator.displaySide() == DisplaySide.LEFT) {
-			int left = gui.guiLeft - 5;
+			int left = gui.getGuiLeft() - 5;
 			pagePreviousX = parentCategoryX = left - LEFT_BUTTON_WIDTH;
 			pageNextX = left - 20;
 		} else {
-			int right = gui.guiLeft + gui.xSize + 5;
+			int right = gui.getGuiLeft() + gui.getXSize() + 5;
 			pagePreviousX = parentCategoryX = right;
 			pageNextX = right + LEFT_BUTTON_WIDTH - 20;
 		}
-		parentCategory = new GuiButton(BUTTON_ID_PARENT_CATEGORY, parentCategoryX, gui.guiTop - 22, LEFT_BUTTON_WIDTH, 20, "");
-		pagePrevious = new GuiButton(BUTTON_ID_PAGE_PREVIOUS, pagePreviousX, gui.guiTop + gui.ySize + 1, 20, 20, "<");
-		pageNext = new GuiButton(BUTTON_ID_PAGE_NEXT, pageNextX, gui.guiTop + gui.ySize + 1, 20, 20, ">");
+		parentCategory = new GuiButton(BUTTON_ID_PARENT_CATEGORY, parentCategoryX, gui.getGuiTop() - 22, LEFT_BUTTON_WIDTH, 20, "");
+		pagePrevious = new GuiButton(BUTTON_ID_PAGE_PREVIOUS, pagePreviousX, gui.getGuiTop() + gui.getYSize() + 1, 20, 20, "<");
+		pageNext = new GuiButton(BUTTON_ID_PAGE_NEXT, pageNextX, gui.getGuiTop() + gui.getYSize() + 1, 20, 20, ">");
 		gui.buttonList.add(parentCategory);
 		gui.buttonList.add(pagePrevious);
 		gui.buttonList.add(pageNext);
@@ -421,8 +420,8 @@ public class Cacti {
 			tabsArray[len++] = tab;
 		}
 		CreativeTabs[] arr = CreativeTabs.CREATIVE_TAB_ARRAY = new CreativeTabs[Math.max(len + 2, 12)];
-		arr[CreativeTabs.SEARCH.tabIndex] = CreativeTabs.SEARCH;
-		arr[CreativeTabs.INVENTORY.tabIndex] = CreativeTabs.INVENTORY;
+		arr[CreativeTabs.SEARCH.getTabIndex()] = CreativeTabs.SEARCH;
+		arr[CreativeTabs.INVENTORY.getTabIndex()] = CreativeTabs.INVENTORY;
 		for (int i = 0, idx = 0; i < len; idx++) {
 			if (arr[idx] == null) {
 				(arr[idx] = tabsArray[i++]).tabIndex = idx;
@@ -440,10 +439,10 @@ public class Cacti {
 				}
 			}
 			if (needPrev) {
-				gui.buttonList.add(new GuiButton(prevId, gui.guiLeft, gui.guiTop - 50, 20, 20, "<"));
+				gui.buttonList.add(new GuiButton(prevId, gui.getGuiLeft(), gui.getGuiTop() - 50, 20, 20, "<"));
 			}
 			if (needNext) {
-				gui.buttonList.add(new GuiButton(nextId, gui.guiLeft + gui.xSize - 20, gui.guiTop - 50, 20, 20, ">"));
+				gui.buttonList.add(new GuiButton(nextId, gui.getGuiLeft() + gui.getXSize() - 20, gui.getGuiTop() - 50, 20, 20, ">"));
 			}
 			maxPages = (arr.length - 3) / 10;
 		} else {
@@ -496,7 +495,7 @@ public class Cacti {
 	}
 
 	private static void updateRibbonWidths() {
-		FontRenderer font = Minecraft.getMinecraft().fontRendererObj;
+		FontRenderer font = Minecraft.getMinecraft().fontRenderer;
 		for (int i = 0; i < ribbonWidths.length; i++) {
 			if (i < currentPageEntries.size()) {
 				ribbonWidths[i] = font.getStringWidth(currentPageEntries.get(i).getDisplayName());
@@ -553,15 +552,15 @@ public class Cacti {
 		int xLeft, xRight, xAlong;
 		if (Configurator.displaySide() == DisplaySide.LEFT) {
 			xLeft = 0;
-			xRight = gui.guiLeft;
-			xAlong = gui.guiLeft - mouseX - 1;
+			xRight = gui.getGuiLeft();
+			xAlong = gui.getGuiLeft() - mouseX - 1;
 		} else {
-			xLeft = gui.guiLeft + gui.xSize;
+			xLeft = gui.getGuiLeft() + gui.getXSize();
 			xRight = gui.width;
 			xAlong = mouseX - xLeft;
 		}
-		if (mouseX >= xLeft && mouseX < xRight && mouseY >= gui.guiTop + RIBBON_START_Y_OFFSET) {
-			int index = (mouseY - gui.guiTop - RIBBON_START_Y_OFFSET - 1) / (RIBBON_TILE_SIZE - 1);
+		if (mouseX >= xLeft && mouseX < xRight && mouseY >= gui.getGuiTop() + RIBBON_START_Y_OFFSET) {
+			int index = (mouseY - gui.getGuiTop() - RIBBON_START_Y_OFFSET - 1) / (RIBBON_TILE_SIZE - 1);
 			if (index < currentPageEntries.size() && xAlong < ribbonWidths[index] + 6) {
 				return currentPageEntries.get(index);
 			}
@@ -586,30 +585,30 @@ public class Cacti {
 		boolean parentCategoryButtonVisible = parentCategory.visible;
 		boolean renderPages = pages > 0;
 		if (parentCategoryButtonVisible || renderPages) {
-			int leftX = gui.guiLeft - 5;
+			int leftX = gui.getGuiLeft() - 5;
 			int shift = Math.max(0, LEFT_BUTTON_WIDTH - leftX + 2);
 			int leftWidth = LEFT_BUTTON_WIDTH - shift;
 			leftX += shift;
 			if (parentCategoryButtonVisible) {
 				parentCategory.width = leftWidth;
 				if (Configurator.displaySide() == DisplaySide.LEFT) {
-					parentCategory.xPosition = leftX - LEFT_BUTTON_WIDTH;
+					parentCategory.x = leftX - LEFT_BUTTON_WIDTH;
 				}
-				parentCategory.displayString = fitString(gui.mc.fontRendererObj, currentCategory.getDisplayName(), parentCategory.width - 6);
+				parentCategory.displayString = fitString(gui.mc.fontRenderer, currentCategory.getDisplayName(), parentCategory.width - 6);
 			}
 			if (renderPages) {
 				if (Configurator.displaySide() == DisplaySide.LEFT) {
-					pagePrevious.xPosition = leftX - LEFT_BUTTON_WIDTH;
+					pagePrevious.x = leftX - LEFT_BUTTON_WIDTH;
 				} else {
-					pageNext.xPosition = parentCategory.xPosition + leftWidth - pageNext.width;
+					pageNext.x = parentCategory.x + leftWidth - pageNext.width;
 				}
-				FontRenderer font = gui.mc.fontRendererObj;
+				FontRenderer font = gui.mc.fontRenderer;
 				String str = String.format("%d / %d", categoryPage + 1, pages + 1);
-				if (pageNext.xPosition - pagePrevious.xPosition - pagePrevious.width - 5 < font.getStringWidth(str)) {
+				if (pageNext.x - pagePrevious.x - pagePrevious.width - 5 < font.getStringWidth(str)) {
 					str = Integer.toString(categoryPage + 1);
 				}
 				int w = font.getStringWidth(str);
-				font.drawString(str, (pagePrevious.xPosition + pagePrevious.width + pageNext.xPosition) / 2 - w / 2, gui.guiTop + gui.ySize + 7, 0xFFFFFF);
+				font.drawString(str, (pagePrevious.x + pagePrevious.width + pageNext.x) / 2 - w / 2, gui.getGuiTop() + gui.getYSize() + 7, 0xFFFFFF);
 			}
 		}
 	}
@@ -618,19 +617,19 @@ public class Cacti {
 	public static void drawScreen(GuiContainerCreative gui, int mouseX, int mouseY) {
 		CactiEntry entry = getCategoryAtCursor(gui, mouseX, mouseY);
 		if (entry != null) {
-			FontRenderer font = gui.mc.fontRendererObj;
+			FontRenderer font = gui.mc.fontRenderer;
 			String name = entry.getDisplayName();
-			String shown = fitString(font, name, getAvailableEntryWidth(font, gui.guiLeft - 3, name) - 4);
+			String shown = fitString(font, name, getAvailableEntryWidth(font, gui.getGuiLeft() - 3, name) - 4);
 			if (!name.equals(shown)) {
-				gui.drawCreativeTabHoveringText(entry.getDisplayName(), mouseX, mouseY);
+				gui.drawHoveringText(entry.getDisplayName(), mouseX, mouseY);
 			}
 		}
 		GlStateManager.disableLighting();
 	}
 
 	private static void renderEntryRibbonTiles(GuiContainer gui, List<CactiEntry> entries, CactiEntry selected, Pass pass) {
-		FontRenderer font = gui.mc.fontRendererObj;
-		int rightSpace = gui.guiLeft - 3;
+		FontRenderer font = gui.mc.fontRenderer;
+		int rightSpace = gui.getGuiLeft() - 3;
 		for (int i = 0, size = entries.size(); i < size; i++) {
 			CactiEntry entry = entries.get(i);
 			String name = entry.getDisplayName();
@@ -641,11 +640,11 @@ public class Cacti {
 			int offset = (width + 1) % RIBBON_TILE_SIZE;
 			int x;
 			if (Configurator.displaySide() == DisplaySide.LEFT) {
-				x = gui.guiLeft - RIBBON_TILE_SIZE - offset + RIBBON_X_OFFSET;
+				x = gui.getGuiLeft() - RIBBON_TILE_SIZE - offset + RIBBON_X_OFFSET;
 			} else {
-				x = gui.guiLeft + gui.xSize - RIBBON_TILE_SIZE * 2 + offset + RIBBON_X_OFFSET;
+				x = gui.getGuiLeft() + gui.getXSize() - RIBBON_TILE_SIZE * 2 + offset + RIBBON_X_OFFSET;
 			}
-			int y = gui.guiTop + RIBBON_START_Y_OFFSET + RIBBON_HEIGHT * i;
+			int y = gui.getGuiTop() + RIBBON_START_Y_OFFSET + RIBBON_HEIGHT * i;
 			boolean isSelected = entry == selected;
 			if (shouldUseButtonRibbonRender) {
 				renderButtonRibbon(gui, isSelected, pass, font, name, width, x, y);
@@ -664,16 +663,16 @@ public class Cacti {
 		width -= 1;
 		if (pass == Pass.TEXT) {
 			if (Configurator.displaySide() == DisplaySide.LEFT) {
-				font.drawStringWithShadow(name, gui.guiLeft - width - (width + 1) % 2, y + 3, 0xFFFFFF);
+				font.drawStringWithShadow(name, gui.getGuiLeft() - width - (width + 1) % 2, y + 3, 0xFFFFFF);
 			} else {
-				font.drawStringWithShadow(name, gui.guiLeft + gui.xSize + 5, y + 3, 0xFFFFFF);
+				font.drawStringWithShadow(name, gui.getGuiLeft() + gui.getXSize() + 5, y + 3, 0xFFFFFF);
 			}
 			return;
 		}
 		if (Configurator.displaySide() == DisplaySide.LEFT) {
-			x = gui.guiLeft - width - 4 + width % 2;
+			x = gui.getGuiLeft() - width - 4 + width % 2;
 		} else {
-			x = gui.guiLeft + gui.xSize + 2;
+			x = gui.getGuiLeft() + gui.getXSize() + 2;
 		}
 		int vOffset = isSelected ? 20 : 0;
 		width = width / 2 + 1;
@@ -686,9 +685,9 @@ public class Cacti {
 	private static void renderRegularRibbon(GuiContainer gui, boolean isSelected, Pass pass, FontRenderer font, String name, int width, int tiles, int offset, int x, int y) {
 		if (pass == Pass.TEXT) {
 			if (Configurator.displaySide() == DisplaySide.LEFT) {
-				font.drawString(name, gui.guiLeft - width + 4, y + 5, 0x404040);
+				font.drawString(name, gui.getGuiLeft() - width + 4, y + 5, 0x404040);
 			} else {
-				font.drawString(name, gui.guiLeft + gui.xSize + 2, y + 5, 0x404040);
+				font.drawString(name, gui.getGuiLeft() + gui.getXSize() + 2, y + 5, 0x404040);
 			}
 			return;
 		}
@@ -697,9 +696,9 @@ public class Cacti {
 			v = 0;
 			GlStateManager.translate(0, 0, 1);
 			if (Configurator.displaySide() == DisplaySide.LEFT) {
-				gui.drawTexturedModalRect(gui.guiLeft, y, 51, 0, 4, RIBBON_TILE_SIZE);
+				gui.drawTexturedModalRect(gui.getGuiLeft(), y, 51, 0, 4, RIBBON_TILE_SIZE);
 			} else {
-				gui.drawTexturedModalRect(gui.guiLeft + gui.xSize - 4, y, 81, 0, 4, RIBBON_TILE_SIZE);
+				gui.drawTexturedModalRect(gui.getGuiLeft() + gui.getXSize() - 4, y, 81, 0, 4, RIBBON_TILE_SIZE);
 			}
 			GlStateManager.translate(0, 0, -1);
 		} else {
@@ -707,9 +706,9 @@ public class Cacti {
 		}
 		if (tiles > 0) {
 			if (Configurator.displaySide() == DisplaySide.LEFT) {
-				gui.drawTexturedModalRect(gui.guiLeft - RIBBON_TILE_SIZE, y, 34, v, RIBBON_TILE_SIZE, RIBBON_TILE_SIZE);
+				gui.drawTexturedModalRect(gui.getGuiLeft() - RIBBON_TILE_SIZE, y, 34, v, RIBBON_TILE_SIZE, RIBBON_TILE_SIZE);
 			} else {
-				gui.drawTexturedModalRect(gui.guiLeft + gui.xSize, y, 34, v, RIBBON_TILE_SIZE, RIBBON_TILE_SIZE);
+				gui.drawTexturedModalRect(gui.getGuiLeft() + gui.getXSize(), y, 34, v, RIBBON_TILE_SIZE, RIBBON_TILE_SIZE);
 			}
 		}
 		for (int t = 1, lastTile = tiles - 1;; t++) {
@@ -733,25 +732,25 @@ public class Cacti {
 		}
 	}
 
-	@HookInvoked(callerClass = InventoryEffectRenderer.class, callerMethods = "drawActivePotionEffects()V")
+	@HookInvoked(callerClass = InventoryEffectRenderer.class, callerMethods = "drawActivePotionEffects()")
 	public static boolean drawActivePotionEffects(InventoryEffectRenderer gui) {
 		if (!(gui instanceof GuiContainerCreative)) {
 			return true;
 		}
 		final int texV = 166;
 		final int texWidth = 120;
-		int leftSpace = gui.guiLeft - 4;
+		int leftSpace = gui.getGuiLeft() - 4;
 		int widthReduceAmount = Math.max(0, texWidth - leftSpace);
 		int texFullWidth = texWidth - widthReduceAmount;
 		int texSplitWidth = texFullWidth / 2;
-		int x, y = gui.guiTop;
+		int x, y = gui.getGuiTop();
 		if (Configurator.displaySide() == DisplaySide.LEFT) {
-			x = gui.guiLeft + gui.xSize + 2;
+			x = gui.getGuiLeft() + gui.getXSize() + 2;
 		} else {
-			x = gui.guiLeft - texFullWidth - 2;
+			x = gui.getGuiLeft() - texFullWidth - 2;
 		}
-		Collection<PotionEffect> collection = gui.mc.thePlayer.getActivePotionEffects();
-		FontRenderer font = gui.mc.fontRendererObj;
+		Collection<PotionEffect> collection = gui.mc.player.getActivePotionEffects();
+		FontRenderer font = gui.mc.fontRenderer;
 		if (!collection.isEmpty()) {
 			GlStateManager.disableLighting();
 			int yStride = 33;

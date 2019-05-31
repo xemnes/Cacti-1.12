@@ -11,8 +11,8 @@ public class CactiGuiFactory implements IModGuiFactory {
 	public void initialize(Minecraft mc) {}
 
 	@Override
-	public Class<? extends GuiScreen> mainConfigGuiClass() {
-		return GuiConfigCacti.class;
+	public boolean hasConfigGui() {
+		return GuiConfigCacti.class != null;
 	}
 
 	@Override
@@ -21,7 +21,7 @@ public class CactiGuiFactory implements IModGuiFactory {
 	}
 
 	@Override
-	public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
+	public GuiScreen createConfigGui(GuiScreen parentScreen) {
 		return null;
 	}
 }
